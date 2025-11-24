@@ -37,3 +37,7 @@
 
 - Formatação automática do código, usado em conjunto com o ESlint para manter a qualidade do código.
 - https://prettier.io/
+
+### Prisma 
+- É um ORM (Object-Relational Mapping) responsável pela comunicação entre o código e o banco de dados, através de models que geram as tabelas.
+- https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/postgresql
