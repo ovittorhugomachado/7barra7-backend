@@ -25,11 +25,6 @@ export default defineConfig([
       prettier: prettierPlugin,
     },
 
-    extends: [
-      js.configs.recommended,
-      ...tseslint.configs.recommended,
-      prettier,
-      'plugin:prettier/recommended', 
-    ],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended, prettier],
   },
 ]);
