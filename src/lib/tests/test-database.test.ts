@@ -1,4 +1,4 @@
-import { prisma } from '../lib/prisma';
+import { prisma } from '../prisma';
 
 describe('Database Connection', () => {
   beforeAll(async () => {

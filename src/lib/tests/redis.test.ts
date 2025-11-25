@@ -1,4 +1,4 @@
-import redisClient, { redisAvailable } from '../lib/redis';
+import redisClient, { redisAvailable } from '../redis';
 
 describe('Redis Connection', () => {
   beforeAll(async () => {
