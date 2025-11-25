@@ -5,6 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:redis": "jest src/tests/redis.test.ts",
+    "test:db": "jest src/tests/test-database.test.ts",
     "check:lint": "eslint src",
     "fix:lint": "eslint src --fix",
     "check:style": "prettier . --check",
@@ -18,20 +23,24 @@
     "@prisma/client": "^6.19.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "redis": "^5.10.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
     "@types/pg": "^8.15.6",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.5.0",
+    "jest": "^30.2.0",
     "prettier": "^3.6.2",
     "prisma": "^6.19.0",
+    "ts-jest": "^29.4.5",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.47.0"
