@@ -29,7 +29,6 @@ describe('Redis Connection', () => {
   });
 
   afterEach(async () => {
-    // Limpar dados de teste
     await redisClient.del('test');
   });
 
