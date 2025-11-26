@@ -8,8 +8,8 @@ const redisClient = createClient({
   socket: {
     reconnectStrategy() {
       return 10000;
-    }
-  }
+    },
+  },
 });
 
 redisClient.on('connect', () => {
@@ -31,7 +31,7 @@ redisClient.on('error', (err) => {
   redisAvailable = false;
 });
 
-redisClient.connect().catch(err => {
+redisClient.connect().catch((err) => {
   console.log('Erro inicial ao conectar no Redis:', err);
 });
 
