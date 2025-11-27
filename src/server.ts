@@ -1,8 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import testRoutes from './modules/tests/tests.routes';
-import { testJwtRoutes } from './modules/teste-jwt';
 
 const app = express();
 
@@ -16,9 +14,6 @@ app.use(
     credentials: true,
   }),
 );
-
-app.use(testJwtRoutes);
-app.use(testRoutes);
 
 app.get('/ping', (req, res) => {
   res.json({ message: 'pong' });
