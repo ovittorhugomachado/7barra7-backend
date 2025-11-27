@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
 
 type EncryptPassword = (password: string) => Promise<string>;
 type ComparePassword = (password: string, hash: string) => Promise<boolean>;

@@ -1,16 +1,16 @@
 import jwt from 'jsonwebtoken';
 
 const JWT_ACCESS_TOKEN_SECRET: string =
-  process.env.JWT_SECRET || 'minha_chave_secreta_super_segura_2024';
+  process.env.JWT_ACCESS_TOKEN_SECRET || 'minha_chave_secreta_super_segura_acesso';
 const JWT_REFRESH_TOKEN_SECRET: string =
-  process.env.JWT_SECRET || 'minha_chave_secreta_super_segura_2024';
+  process.env.JWT_REFRESH_TOKEN_SECRET || 'minha_chave_secreta_super_segura_refresh';
 
 export const generateAccessToken = (payload: number | null): string => {
   if (!payload) {
     throw new Error('Payload não pode ser nulo');
   }
 
-  return jwt.sign({ data: payload }, JWT_ACCESS_TOKEN_SECRET, { expiresIn: '1min' });
+  return jwt.sign({ data: payload }, JWT_ACCESS_TOKEN_SECRET, { expiresIn: '15min' });
 };
 
 export const generateRefreshToken = (payload: number | null): string => {

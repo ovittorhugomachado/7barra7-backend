@@ -37,9 +37,7 @@ describe('Bcrypt Helper', () => {
       const hash1 = 'hash1';
       const hash2 = 'hash2';
 
-      (bcrypt.hash as jest.Mock)
-        .mockResolvedValueOnce(hash1)
-        .mockResolvedValueOnce(hash2);
+      (bcrypt.hash as jest.Mock).mockResolvedValueOnce(hash1).mockResolvedValueOnce(hash2);
 
       const result1 = await encryptPassword(password1);
       const result2 = await encryptPassword(password2);
@@ -75,14 +73,13 @@ describe('Bcrypt Helper', () => {
       const mockError = new Error('Falha na comparação');
       (bcrypt.compare as jest.Mock).mockRejectedValue(mockError);
 
-      await expect(comparePassword(mockPassword, mockHash))
-        .rejects.toThrow('Falha na comparação');
+      await expect(comparePassword(mockPassword, mockHash)).rejects.toThrow('Falha na comparação');
     });
 
     it('deve comparar corretamente com hash gerado pelo encryptPassword', async () => {
       const originalPassword = 'senhaOriginal';
       const generatedHash = 'hashGerado';
-      
+
       (bcrypt.hash as jest.Mock).mockResolvedValue(generatedHash);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
