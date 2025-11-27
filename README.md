@@ -68,6 +68,7 @@ Banco de dados em memória usado para cache, sessões e armazenamento de dados t
 ### Bcrypt
 
 Biblioteca de criptografia, usad apara armazenar a senha do usuário de forma segura.
+
 - https://www.npmjs.com/package/bcrypt
 
 ---
@@ -77,6 +78,7 @@ Biblioteca de criptografia, usad apara armazenar a senha do usuário de forma se
 Essa aplicação usa o Bcrypt, que criptografa daddos senspiveis e o JSON Web Tokens (JWT), que gerencia sessões dos usuários, criando 2 tokens, o AccessToken (15 minutos) e o RefreshToken (90 dias), essa abordagem permite que o usuário possa navegar pela aplicação sem precisar fazer o login constantemente, já que o token de longa duração gera um token de curta duração, que é o responsável por autorizar o acesso.
 
 #### Criptografia
+
 As senhas de todos os usuários contam com criptografia, através da bibliote Bcrypt, a segurança e prevenção à ataques é garantida através da geração de hashes com fator de custo (salt rounds) igual a 12, que garante desempenho e proteção contra ataques de força bruta.
 
 #### Access Token:
