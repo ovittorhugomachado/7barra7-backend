@@ -1,4 +1,4 @@
-import { generateAccessToken, generateRefreshToken } from '../lib/jwt';
+import { generateAccessToken, generateRefreshToken } from '../lib/jwt/jwt';
 import { Request, Response, Router } from 'express';
 
 const router = Router();

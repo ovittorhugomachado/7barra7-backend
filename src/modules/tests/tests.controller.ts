@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { loginService, testAuthenticateJwtService } from './tests.service';
-import { generateAccessToken, generateRefreshToken } from '../../lib/jwt';
+import { generateAccessToken, generateRefreshToken } from '../../lib/jwt/jwt';
 
 export const testAuthenticateJwtController = async (req: Request, res: Response) => {
   const userId = req.body;

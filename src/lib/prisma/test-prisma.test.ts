@@ -1,4 +1,4 @@
-import { prisma } from '../prisma';
+import { prisma } from './prisma';
 
 describe('Database Connection', () => {
   beforeAll(async () => {

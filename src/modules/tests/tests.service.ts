@@ -1,4 +1,4 @@
-import { prisma } from '../../lib/prisma';
+import { prisma } from "../../lib/prisma/prisma";
 
 export const testAuthenticateJwtService = async (userId: number) => {
   const user = await prisma.user.findMany({ where: { id: userId } });

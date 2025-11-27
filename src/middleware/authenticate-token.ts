@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { generateAccessToken, verifyRefreshToken, verifyAccessToken } from '../lib/jwt';
+import { generateAccessToken, verifyRefreshToken, verifyAccessToken } from '../lib/jwt/jwt';
 
 interface AuthResult {
   accessToken: string | null;
