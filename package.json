@@ -12,6 +12,7 @@
     "test:prisma": "jest src/lib/prisma/test-prisma.test.ts",
     "test:jwt": "jest src/lib/jwt/jwt.test.ts",
     "test:bcrypt": "jest src/lib/bcrypt/bcrypt.test.ts",
+    "test:authenticate": "jest src/middleware/authenticate-token.test.ts",
     "check:lint": "eslint src",
     "fix:lint": "eslint src --fix",
     "check:style": "prettier . --check",
