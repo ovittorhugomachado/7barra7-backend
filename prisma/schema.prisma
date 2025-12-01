@@ -8,17 +8,215 @@ datasource db {
 }
 
 model User {
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  cpf                 String
+  email               String               @unique
+  password            String
+  phone               String
+  role                Role                 @default(USER)
+  isActive            Boolean              @default(true)
+  //Relações
+  addresses           Address[]
+  orders              Order[]
+  passwordResetTokens PasswordResetToken[]
+  paymentMethods      UserPaymentMethod[]
+  //Datas
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime
+}
+
+model Address {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  //Endereço
+  street         String
+  number         String
+  complement     String?
+  neighborhood   String
+  city           String
+  state          String
+  zipCode        String
+  country        String   @default("Brasil")
+  //Contato
+  recipientName  String
+  recipientPhone String
+  //Status
+  isDefault      Boolean  @default(false)
+  isActive       Boolean  @default(true)
+  //Relações
+  orders         Order[]
+  //Datas
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+  @@map("addresses")
+}
+
+model Order {
+  id                Int         @id @default(autoincrement())
+  orderNumber       String      @unique
+  userId            Int
+  user              User        @relation(fields: [userId], references: [id])
+  //Endereços
+  shippingAddressId Int
+  shippingAddress   Address     @relation(fields: [shippingAddressId], references: [id])
+  //Valores
+  status            OrderStatus @default(PENDING)
+  subtotal          Decimal     @db.Decimal(10, 2)
+  shippingCost      Decimal     @default(0) @db.Decimal(10, 2)
+  discount          Decimal     @default(0) @db.Decimal(10, 2)
+  total             Decimal     @db.Decimal(10, 2)
+  //Informações de entrega
+  estimatedDelivery DateTime?
+  deliveredAt       DateTime?
+  trackingNumber    String?
+  shippingCompany   String?
+  //Relações
+  items             OrderItem[]
+  payments          Payment[]
+  //Datas
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([orderNumber])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id           Int     @id @default(autoincrement())
+  orderId      Int
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    Int // Referência ao model de produtos
+  productName  String
+  productPrice Decimal @db.Decimal(10, 2)
+  quantity     Int
+  totalPrice   Decimal @db.Decimal(10, 2)
+  //Controle de estoque
+  sku          String?
+  product      Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model Payment {
+  id                Int           @id @default(autoincrement())
+  orderId           Int
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  //Informações do pagamento
+  paymentMethod     PaymentMethod
+  status            PaymentStatus @default(PENDING)
+  amount            Decimal       @db.Decimal(10, 2)
+  //Dados específicos por método
+  transactionId     String?       @unique
+  authorizationCode String?
+  installments      Int           @default(1)
+  //Para cartões
+  lastFourDigits    String?
+  cardBrand         String?
+  //Para PIX/Boleto
+  qrCode            String?
+  barcode           String?
+  dueDate           DateTime?
+  paidAt            DateTime?
+  //Datas
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([orderId])
+  @@index([transactionId])
+  @@index([status])
+  @@map("payments")
+}
+
+model UserPaymentMethod {
+  id              Int           @id @default(autoincrement())
+  userId          Int
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paymentMethod   PaymentMethod
+  isDefault       Boolean       @default(false)
+  //Cartões salvos
+  cardLastFour    String?
+  cardBrand       String?
+  cardHolderName  String?
+  cardExpiryMonth Int?
+  cardExpiryYear  Int?
+  //Token seguro (gerado pelo gateway)
+  token           String        @unique
+  //Status
+  isActive        Boolean       @default(true)
+  //Datas
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([userId, token])
+  @@index([userId])
+  @@map("user_payment_methods")
+}
+
+model PasswordResetToken {
   id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  isActive  Boolean  @default(true)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  //Datas
   createdAt DateTime @default(now())
-  updatedAt DateTime
+
+  @@index([token])
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal     @db.Decimal(10, 2)
+  sku         String      @unique
+  stock       Int         @default(0)
+  //Relações
+  orderItems  OrderItem[]
+  //Datas
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("products")
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PIX
+  BOLETO
+  BANK_TRANSFER
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
 }
