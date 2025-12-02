@@ -112,3 +112,17 @@ export const updateUserService = async (userId: number, data: Partial<UserData>)
 
     return updatedUser;
 };
+
+
+export const deleteUserService = async (userId: number) => {
+    const existingUser = await prisma.user.findUnique({ where: { id: userId } });
+    if (!existingUser) {
+        throw new ValidationError('Usuário não encontrado');
+    }
+
+    await prisma.user.delete({
+        where: { id: userId },
+    });
+
+    return;
+}
