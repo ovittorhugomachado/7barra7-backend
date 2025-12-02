@@ -13,7 +13,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const emailConfirmationServiceSender = async (email: string, token: string, userName: string) => {
+export const emailConfirmationServiceSender = async (
+  email: string,
+  token: string,
+  userName: string,
+) => {
   if (!email) {
     throw new Error('O email do destinatário não foi definido.');
   }
@@ -48,11 +52,15 @@ export const emailConfirmationServiceSender = async (email: string, token: strin
 
         <p style="margin-top: 40px;">Atenciosamente,<br><strong>Equipe Virtual Page</strong></p>
       </div>
-    `
+    `,
   });
 };
 
-export const emailChangeConfirmationSender = async (email: string, token: string, userName: string) => {
+export const emailChangeConfirmationSender = async (
+  email: string,
+  token: string,
+  userName: string,
+) => {
   if (!email) {
     throw new Error('O email do destinatário não foi definido.');
   }
@@ -87,12 +95,16 @@ export const emailChangeConfirmationSender = async (email: string, token: string
 
         <p style="margin-top: 40px;">Atenciosamente,<br><strong>Equipe Virtual Page</strong></p>
       </div>
-    `
+    `,
   });
 };
 
-export const emailResetPasswordSender = async (email: string, token: string, userName: string | undefined) => {
-  const resetLink = `${process.env.FRONTEND_URL}/create-new-password/${token}`
+export const emailResetPasswordSender = async (
+  email: string,
+  token: string,
+  userName: string | undefined,
+) => {
+  const resetLink = `${process.env.FRONTEND_URL}/create-new-password/${token}`;
 
   await transporter.sendMail({
     from: `"Virtual Page" <${process.env.EMAIL_USER}>`,
@@ -123,6 +135,6 @@ export const emailResetPasswordSender = async (email: string, token: string, use
 
         <p style="margin-top: 40px;">Atenciosamente,<br><strong>Equipe Virtual Page</strong></p>
       </div>
-    `
+    `,
   });
 };

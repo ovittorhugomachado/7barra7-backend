@@ -1,49 +1,56 @@
-import { encryptPassword } from "../../lib/bcrypt/bcrypt";
-import { prisma } from "../../lib/prisma/prisma";
-import { UserData } from "../../types/user-data";
-import { ValidationError } from "../../utils/error-handler";
-import { sendNotificationFunction } from "../../utils/notification-sender";
-import { stripNonDigits } from "../../utils/strip-formating";
-import { confirmEmailTokenGenerator } from "../../utils/token-generator";
+import { encryptPassword } from '../../lib/bcrypt/bcrypt';
+import { prisma } from '../../lib/prisma/prisma';
+import { UserData } from '../../types/user-data';
+import { ValidationError } from '../../utils/error-handler';
+import { sendNotificationFunction } from '../../utils/notification-sender';
+import { stripNonDigits } from '../../utils/strip-formating';
+import { confirmEmailTokenGenerator } from '../../utils/token-generator';
 
 export const createUserService = async (data: UserData) => {
+  if (!data.email.includes('@')) throw new ValidationError('Email inválido');
+  if (data.password.length < 8) throw new ValidationError('Senha fraca');
+  if (data.password.length > 72) throw new ValidationError('Senha muito longa');
+  if (!/[A-Z]/.test(data.password)) throw new ValidationError('Senha sem letra maiúscula');
+  if (!/[0-9]/.test(data.password)) throw new ValidationError('Senha sem número');
 
-    if (!data.email.includes('@')) throw new ValidationError('Email inválido');
-    if (data.password.length < 8) throw new ValidationError('Senha fraca');
-    if (data.password.length > 72) throw new ValidationError('Senha muito longa');
-    if (!/[A-Z]/.test(data.password)) throw new ValidationError('Senha sem letra maiúscula');
-    if (!/[0-9]/.test(data.password)) throw new ValidationError('Senha sem número');
+  const rawPhoneNumber = stripNonDigits(data.phone);
 
-    const rawPhoneNumber = stripNonDigits(data.phone);
+  const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
+  if (existingUser) throw new ValidationError('Email já cadastrado');
 
-    const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
-    if (existingUser) throw new ValidationError('Email já cadastrado');
+  const hashedPassword = await encryptPassword(data.password);
 
-    const hashedPassword = await encryptPassword(data.password);
+  const { activeEmailToken } = confirmEmailTokenGenerator({ email: data.email });
 
-    const { activeEmailToken } = confirmEmailTokenGenerator({ email: data.email });
+  const newUser = await prisma.user.create({
+    data: {
+      name: data.name,
+      cpf: data.cpf,
+      email: data.email,
+      phone: rawPhoneNumber,
+      password: hashedPassword,
+      role: data.role,
+      isActive: data.isActive,
+      updatedAt: new Date(),
+      emailConfirmationToken: activeEmailToken,
+      emailConfirmationSentAt: new Date(),
+    },
+  });
 
-    const newUser = await prisma.user.create({
-        data: {
-            name: data.name,
-            cpf: data.cpf,
-            email: data.email,
-            phone: rawPhoneNumber,
-            password: hashedPassword,
-            role: data.role,
-            isActive: data.isActive,
-            updatedAt: new Date(),
-            emailConfirmationToken: activeEmailToken,
-            emailConfirmationSentAt: new Date(),
-        }
-    })
+  await sendNotificationFunction({
+    userId: 1,
+    tag: 'AWARD',
+    title: 'Bem-vindo!',
+    text: 'Você deu o passo mais importante para uma vida mais saudável',
+  });
 
-    await sendNotificationFunction({
-        userId: 1,
-        tag: "AWARD",
-        title: "Bem-vindo!",
-        text: "Você deu o passo mais importante para uma vida mais saudável",
-    });
+  return newUser;
+};
 
-    return newUser;
-}
+// export const getUserByIdService = async (id: number) => {
+//   const user = await prisma.user.findUnique({ where: { id } });
+
+//   if (!user) throw new ValidationError('Usuário não encontrado');
+
+//   return user;
+// };

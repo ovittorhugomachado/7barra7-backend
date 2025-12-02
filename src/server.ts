@@ -1,12 +1,15 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
-import userRoutes from './modules/user/user.routes'
+import userRoutes from './modules/user/user.routes';
+import authRoutes from './modules/auth/auth.routes';
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(helmet());
 app.use(
   cors({
@@ -17,12 +20,13 @@ app.use(
   }),
 );
 
-app.get('/ping', (req, res) => {
+app.get('/ping', (_, res) => {
   res.json({ message: 'pong' });
 });
 
 app.use('/api', userRoutes);
+app.use('/api', authRoutes);
 
 app.listen(port, () => {
-  console.log('CORS-enabled web server listening on port 3000');
+  console.log(`Servidor rodando na porta ${port}`);
 });
