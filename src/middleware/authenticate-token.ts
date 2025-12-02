@@ -1,45 +1,39 @@
 import { Request, Response, NextFunction } from 'express';
 import { generateAccessToken, verifyRefreshToken, verifyAccessToken } from '../lib/jwt/jwt';
 
-interface AuthResult {
-  accessToken: string | null;
-  refreshToken: string | null;
-  decoded: string | null;
-}
-
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-  const authResult: AuthResult = {
-    accessToken: req.headers['authorization']?.split(' ')[1] || null,
-    refreshToken: req.cookies?.refreshToken || null,
-    decoded: null,
-  };
+  const accessToken = req.headers['authorization']?.split(' ')[1] || null;
+  const refreshToken = req.cookies?.refreshToken || null;
 
-  if (authResult.accessToken) {
+  // 1. Tentar validar o access token
+  if (accessToken) {
     try {
-      const decoded = verifyAccessToken(authResult.accessToken);
-      req.user = decoded;
+      const decoded = verifyAccessToken(accessToken);
+      req.user = decoded.data;
       return next();
-    } catch (err) {
-      console.error('Erro ao verificar token de acesso:', err);
-      console.log('Access token expirado ou inválido. Tentando refresh...');
+    } catch (error) {
+      console.log('Access token expirado. Tentando usar refresh...', error);
     }
   }
 
-  if (authResult.refreshToken) {
+  // 2. Tentar validar o refresh token
+  if (refreshToken) {
     try {
-      const decoded = verifyRefreshToken(authResult.refreshToken);
-      const newAccessToken = generateAccessToken(
-        typeof decoded === 'string' ? decoded : decoded.data,
-      );
+      const decoded = verifyRefreshToken(refreshToken);
 
+      const newAccessToken = generateAccessToken(decoded.data);
+
+      // enviar novo access token para o front
       res.setHeader('Authorization', `Bearer ${newAccessToken}`);
-      req.user = decoded;
+
+      req.user = decoded.data;
+
       return next();
-    } catch (err) {
-      console.error('Erro ao verificar token de refresh:', err);
-      console.log('Refresh token inválido ou expirado.');
+    } catch (error) {
+      console.log('Refresh token inválido ou expirado.', error);
     }
   }
 
+  // 3. Ambos falharam
   return res.status(401).json({ message: 'Não autorizado. Tokens inválidos ou ausentes.' });
 };

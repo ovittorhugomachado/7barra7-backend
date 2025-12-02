@@ -1,44 +1,47 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
-const JWT_ACCESS_TOKEN_SECRET: string =
+const JWT_ACCESS_TOKEN_SECRET =
   process.env.JWT_ACCESS_TOKEN_SECRET || 'minha_chave_secreta_super_segura_acesso';
-const JWT_REFRESH_TOKEN_SECRET: string =
+
+const JWT_REFRESH_TOKEN_SECRET =
   process.env.JWT_REFRESH_TOKEN_SECRET || 'minha_chave_secreta_super_segura_refresh';
 
-export const generateAccessToken = (payload: object | null): string => {
-  if (!payload) {
-    throw new Error('Payload não pode ser nulo');
-  }
+export interface JwtPayloadData {
+  userId: number;
+}
 
-  return jwt.sign({ data: payload }, JWT_ACCESS_TOKEN_SECRET, { expiresIn: '15min' });
+export const generateAccessToken = (payload: JwtPayloadData) => {
+  return jwt.sign({ data: payload }, JWT_ACCESS_TOKEN_SECRET, {
+    expiresIn: '15m',
+  });
 };
 
-export const generateRefreshToken = (payload: object | null): string => {
-  if (!payload) {
-    throw new Error('Payload não pode ser nulo');
-  }
-
-  return jwt.sign({ data: payload }, JWT_REFRESH_TOKEN_SECRET, { expiresIn: '90d' });
+export const generateRefreshToken = (payload: JwtPayloadData) => {
+  return jwt.sign({ data: payload }, JWT_REFRESH_TOKEN_SECRET, {
+    expiresIn: '90d',
+  });
 };
 
-export const verifyAccessToken = (token: string) => {
-  try {
-    return jwt.verify(token, JWT_ACCESS_TOKEN_SECRET);
-  } catch (error) {
-    console.error('Erro ao verificar token JWT:', error);
-    throw new Error('Token inválido ou expirado');
+export const verifyAccessToken = (token: string): JwtPayload & { data: JwtPayloadData } => {
+  const decoded = jwt.verify(token, JWT_ACCESS_TOKEN_SECRET);
+
+  if (typeof decoded === 'string') {
+    throw new Error('Token inválido');
   }
+
+  return decoded as JwtPayload & { data: JwtPayloadData };
 };
 
-export const verifyRefreshToken = (token: string) => {
-  try {
-    return jwt.verify(token, JWT_REFRESH_TOKEN_SECRET);
-  } catch (error) {
-    console.error('Erro ao verificar refresh token:', error);
-    throw new Error('Refresh token inválido ou expirado');
+export const verifyRefreshToken = (token: string): JwtPayload & { data: JwtPayloadData } => {
+  const decoded = jwt.verify(token, JWT_REFRESH_TOKEN_SECRET);
+
+  if (typeof decoded === 'string') {
+    throw new Error('Refresh token inválido');
   }
+
+  return decoded as JwtPayload & { data: JwtPayloadData };
 };
 
 export const decodeAccessToken = (token: string) => {
-  return jwt.decode(token);
+  return jwt.decode(token) as (JwtPayload & { data: JwtPayloadData }) | null;
 };
