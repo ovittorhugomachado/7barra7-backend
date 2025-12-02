@@ -69,36 +69,45 @@ export const getUserDataByIdService = async (userId: number) => {
   return user;
 };
 
-
 export const updateUserService = async (userId: number, data: Partial<UserData>) => {
-    const existingUser = await prisma.user.findUnique({ where: { id: userId } });
-    if (!existingUser) {
-        throw new ValidationError('Usuário não encontrado');
-    }
+  const existingUser = await prisma.user.findUnique({ where: { id: userId } });
+  if (!existingUser) {
+    throw new ValidationError('Usuário não encontrado');
+  }
 
-    const existingEmailUser = await prisma.user.findUnique({ where: { email: data.email || '' } });
+  if (data.email) {
+    const existingEmailUser = await prisma.user.findUnique({ where: { email: data.email } });
     if (existingEmailUser && existingEmailUser.id !== userId) {
-        throw new ValidationError('Email já cadastrado');
+      throw new ValidationError('Email já cadastrado');
     }
+  }
 
-    const updatedUser = await prisma.user.update({
-        where: { id: userId },
-        data: {
-            name: data.name || existingUser.name,
-            cpf: data.cpf || existingUser.cpf,
-            email: data.email || existingUser.email,
-            phone: data.phone || existingUser.phone,
-            updatedAt: new Date(),
-        },
-        select: {
-            id: true,
-            name: true,
-            cpf: true,
-            email: true,
-            phone: true,
-            updatedAt: true,
-        },
-    });
+  if (data.phone) {
+    const rawPhoneNumber = stripNonDigits(data.phone);
+    const existingPhoneUser = await prisma.user.findUnique({ where: { phone: rawPhoneNumber } });
+    if (existingPhoneUser && existingPhoneUser.id !== userId) {
+      throw new ValidationError('Celular já cadastrado');
+    }
+  }
 
-    return updatedUser;
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      name: data.name || existingUser.name,
+      cpf: data.cpf || existingUser.cpf,
+      email: data.email || existingUser.email,
+      phone: data.phone ? stripNonDigits(data.phone) : existingUser.phone,
+      updatedAt: new Date(),
+    },
+    select: {
+      id: true,
+      name: true,
+      cpf: true,
+      email: true,
+      phone: true,
+      updatedAt: true,
+    },
+  });
+
+  return updatedUser;
 };

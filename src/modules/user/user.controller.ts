@@ -33,7 +33,6 @@ export const getUserByIdController = async (req: Request, res: Response): Promis
   }
 };
 
-
 export const updateUserController = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.user?.userId;
@@ -45,7 +44,9 @@ export const updateUserController = async (req: Request, res: Response): Promise
 
     const updatedUser = await updateUserService(userId, req.body);
 
-    res.status(200).json({ success: true, message: 'Usuário atualizado com sucesso', user: updatedUser });
+    res
+      .status(200)
+      .json({ success: true, message: 'Usuário atualizado com sucesso', user: updatedUser });
     return;
   } catch (error) {
     handleControllerError(res, error);

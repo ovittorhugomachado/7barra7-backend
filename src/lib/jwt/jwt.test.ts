@@ -13,7 +13,7 @@ jest.mock('jsonwebtoken');
 const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
 
 describe('JWT Helper', () => {
-  const mockUserId: JwtPayloadData = { userId: 123 };;
+  const mockUserId: JwtPayloadData = { userId: 123 };
   const mockAccessToken = 'mock.access.token';
   const mockRefreshToken = 'mock.refresh.token';
 
