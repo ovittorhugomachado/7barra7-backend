@@ -10,7 +10,7 @@ const router = Router();
 
 router.post('/create-user', createUserController);
 
-router.get('/user-data/:id', authenticateToken, getUserByIdController);
+router.get('/user-data/me', authenticateToken, getUserByIdController);
 
 router.put('/update-user/me', authenticateToken, updateUserController);
 

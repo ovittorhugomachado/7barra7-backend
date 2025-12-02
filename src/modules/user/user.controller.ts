@@ -22,7 +22,7 @@ export const createUserController = async (req: Request, res: Response): Promise
 
 export const getUserByIdController = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = Number(req.params.id);
+    const userId = req.user?.userId;
     const user = await getUserDataByIdService(userId);
 
     res.status(200).json({ success: true, user });
