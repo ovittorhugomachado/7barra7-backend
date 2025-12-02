@@ -5,10 +5,10 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
   const accessToken = req.headers['authorization']?.split(' ')[1] || null;
   const refreshToken = req.cookies?.refreshToken || null;
 
-  // 1. Tentar validar o access token
   if (accessToken) {
     try {
       const decoded = verifyAccessToken(accessToken);
+
       req.user = decoded.data;
       return next();
     } catch (error) {
@@ -16,14 +16,12 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     }
   }
 
-  // 2. Tentar validar o refresh token
   if (refreshToken) {
     try {
       const decoded = verifyRefreshToken(refreshToken);
 
       const newAccessToken = generateAccessToken(decoded.data);
 
-      // enviar novo access token para o front
       res.setHeader('Authorization', `Bearer ${newAccessToken}`);
 
       req.user = decoded.data;
@@ -34,6 +32,5 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     }
   }
 
-  // 3. Ambos falharam
   return res.status(401).json({ message: 'Não autorizado. Tokens inválidos ou ausentes.' });
 };

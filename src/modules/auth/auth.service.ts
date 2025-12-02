@@ -1,5 +1,6 @@
 import { UnauthorizedError } from '../../utils/error-handler';
-import { generateTokensPassword } from '../../utils/token-generator';
+import { generateAccessToken } from '../../lib/jwt/jwt';
+import { generateRefreshToken } from '../../lib/jwt/jwt';
 import { prisma } from '../../lib/prisma/prisma';
 import bcrypt from 'bcrypt';
 
@@ -18,7 +19,8 @@ export const loginService = async (email: string, password: string) => {
     userId: user.id,
   };
 
-  const { accessToken7barra7, refreshAccessToken7barra7 } = generateTokensPassword(payload);
+  const accessToken7barra7 = generateAccessToken(payload);
+  const refreshToken7barra7 = generateRefreshToken(payload);
 
   await prisma.refreshToken.deleteMany({
     where: {
@@ -30,12 +32,12 @@ export const loginService = async (email: string, password: string) => {
   await prisma.refreshToken.create({
     data: {
       userId: user.id,
-      token: refreshAccessToken7barra7,
+      token: refreshToken7barra7,
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     },
   });
 
-  return { accessToken7barra7, refreshAccessToken7barra7 };
+  return { accessToken7barra7, refreshToken7barra7 };
 };
 
 export const logouService = async (refreshToken: string) => {

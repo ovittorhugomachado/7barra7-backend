@@ -6,9 +6,9 @@ export const loginController = async (req: Request, res: Response): Promise<void
   try {
     const { email, password } = req.body;
 
-    const { accessToken7barra7, refreshAccessToken7barra7 } = await loginService(email, password);
+    const { accessToken7barra7, refreshToken7barra7 } = await loginService(email, password);
 
-    res.cookie('refreshToken', refreshAccessToken7barra7, {
+    res.cookie('refreshToken', refreshToken7barra7, {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
@@ -16,6 +16,7 @@ export const loginController = async (req: Request, res: Response): Promise<void
     });
 
     res.status(200).json({
+      success: true,
       message: 'Login efetuado com sucesso',
       accessToken: accessToken7barra7,
     });
@@ -40,7 +41,7 @@ export const logoutController = async (req: Request, res: Response): Promise<voi
       path: '/',
     });
 
-    res.status(200).json({ message: 'Logout realizado com sucesso' });
+    res.status(200).json({ success: true, message: 'Logout realizado com sucesso' });
     return;
   } catch (error) {
     handleControllerError(res, error);
