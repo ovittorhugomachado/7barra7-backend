@@ -15,8 +15,11 @@ export const createUserService = async (data: UserData) => {
 
   const rawPhoneNumber = stripNonDigits(data.phone);
 
-  const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
-  if (existingUser) throw new ValidationError('Email já cadastrado');
+  const existingEmailUser = await prisma.user.findUnique({ where: { email: data.email } });
+  if (existingEmailUser) throw new ValidationError('Email já cadastrado');
+
+  const existingPhoneUser = await prisma.user.findUnique({ where: { phone: rawPhoneNumber } });
+  if (existingPhoneUser) throw new ValidationError('Celular já cadastrado');
 
   const hashedPassword = await encryptPassword(data.password);
 
@@ -71,6 +74,11 @@ export const updateUserService = async (userId: number, data: Partial<UserData>)
     const existingUser = await prisma.user.findUnique({ where: { id: userId } });
     if (!existingUser) {
         throw new ValidationError('Usuário não encontrado');
+    }
+
+    const existingEmailUser = await prisma.user.findUnique({ where: { email: data.email || '' } });
+    if (existingEmailUser && existingEmailUser.id !== userId) {
+        throw new ValidationError('Email já cadastrado');
     }
 
     const updatedUser = await prisma.user.update({
