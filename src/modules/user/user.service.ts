@@ -47,10 +47,21 @@ export const createUserService = async (data: UserData) => {
   return newUser;
 };
 
-// export const getUserByIdService = async (id: number) => {
-//   const user = await prisma.user.findUnique({ where: { id } });
+export const getUserDataByIdService = async (userId: number) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      cpf: true,
+      phone: true,
+      email: true,
+      emailConfirmed: true,
+      createdAt: true,
+    },
+  });
 
-//   if (!user) throw new ValidationError('Usuário não encontrado');
+  if (!user) throw new ValidationError('Usuário não encontrado');
 
-//   return user;
-// };
+  return user;
+};

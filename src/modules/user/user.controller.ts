@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { handleControllerError } from '../../utils/error-handler';
-import { createUserService } from './user.service';
+import { createUserService, getUserDataByIdService } from './user.service';
 import { signUpFieldsErrorChecker } from '../../utils/field-error-checker';
 
 export const createUserController = async (req: Request, res: Response): Promise<void> => {
@@ -13,22 +13,22 @@ export const createUserController = async (req: Request, res: Response): Promise
 
     await createUserService(req.body);
 
-    res.status(201).json({ message: 'Usuário criado com sucesso' });
+    res.status(201).json({ success: true, message: 'Usuário criado com sucesso' });
     return;
   } catch (error) {
     handleControllerError(res, error);
   }
 };
 
-// export const getUserByIdController = async (req: Request, res: Response): Promise<void> => {
-//   try {
-//     const userId = Number(req.params.id);
-//     const user = await getUserByIdService(userId);
+export const getUserByIdController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = Number(req.params.id);
+    const user = await getUserDataByIdService(userId);
 
-//     res.status(200).json(user);
+    res.status(200).json({ success: true, user });
 
-//     return;
-//   } catch (error) {
-//     handleControllerError(res, error);
-//   }
-// };
+    return;
+  } catch (error) {
+    handleControllerError(res, error);
+  }
+};
