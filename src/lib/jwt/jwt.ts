@@ -5,7 +5,7 @@ const JWT_ACCESS_TOKEN_SECRET: string =
 const JWT_REFRESH_TOKEN_SECRET: string =
   process.env.JWT_REFRESH_TOKEN_SECRET || 'minha_chave_secreta_super_segura_refresh';
 
-export const generateAccessToken = (payload: number | null): string => {
+export const generateAccessToken = (payload: object | null): string => {
   if (!payload) {
     throw new Error('Payload não pode ser nulo');
   }
@@ -13,7 +13,7 @@ export const generateAccessToken = (payload: number | null): string => {
   return jwt.sign({ data: payload }, JWT_ACCESS_TOKEN_SECRET, { expiresIn: '15min' });
 };
 
-export const generateRefreshToken = (payload: number | null): string => {
+export const generateRefreshToken = (payload: object | null): string => {
   if (!payload) {
     throw new Error('Payload não pode ser nulo');
   }
