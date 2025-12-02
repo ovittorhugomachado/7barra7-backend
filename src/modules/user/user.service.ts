@@ -65,3 +65,32 @@ export const getUserDataByIdService = async (userId: number) => {
 
   return user;
 };
+
+
+export const updateUserService = async (userId: number, data: Partial<UserData>) => {
+    const existingUser = await prisma.user.findUnique({ where: { id: userId } });
+    if (!existingUser) {
+        throw new ValidationError('Usuário não encontrado');
+    }
+
+    const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: {
+            name: data.name || existingUser.name,
+            cpf: data.cpf || existingUser.cpf,
+            email: data.email || existingUser.email,
+            phone: data.phone || existingUser.phone,
+            updatedAt: new Date(),
+        },
+        select: {
+            id: true,
+            name: true,
+            cpf: true,
+            email: true,
+            phone: true,
+            updatedAt: true,
+        },
+    });
+
+    return updatedUser;
+};

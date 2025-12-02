@@ -10,40 +10,53 @@ export interface JwtPayloadData {
   userId: number;
 }
 
-export const generateAccessToken = (payload: JwtPayloadData) => {
+export const generateAccessToken = (payload: JwtPayloadData | null) => {
+  if (!payload) {
+    throw new Error('Payload não pode ser nulo');
+  }
+
   return jwt.sign({ data: payload }, JWT_ACCESS_TOKEN_SECRET, {
     expiresIn: '15m',
   });
 };
 
-export const generateRefreshToken = (payload: JwtPayloadData) => {
+export const generateRefreshToken = (payload: JwtPayloadData | null) => {
+  if (!payload) {
+    throw new Error('Payload não pode ser nulo');
+  }
+
   console.log('ACCESS TOKEN SECRET:', JWT_ACCESS_TOKEN_SECRET);
   console.log('REFRESH TOKEN SECRET:', JWT_REFRESH_TOKEN_SECRET);
+
   return jwt.sign({ data: payload }, JWT_REFRESH_TOKEN_SECRET, {
     expiresIn: '90d',
   });
 };
 
 export const verifyAccessToken = (token: string): JwtPayload & { data: JwtPayloadData } => {
-  const decoded = jwt.verify(token, JWT_ACCESS_TOKEN_SECRET);
-  console.log('ACCESS TOKEN SECRET:', JWT_ACCESS_TOKEN_SECRET);
-  console.log('REFRESH TOKEN SECRET:', JWT_REFRESH_TOKEN_SECRET);
-
-  if (typeof decoded === 'string') {
-    throw new Error('Token inválido');
+  try {
+    const decoded = jwt.verify(token, JWT_ACCESS_TOKEN_SECRET);
+    if (typeof decoded === 'string') {
+      throw new Error('Token inválido ou expirado');
+    }
+    return decoded as JwtPayload & { data: JwtPayloadData };
+  } catch (error) {
+    console.error('Erro ao verificar token JWT:', error);
+    throw new Error('Token inválido ou expirado');
   }
-
-  return decoded as JwtPayload & { data: JwtPayloadData };
 };
 
 export const verifyRefreshToken = (token: string): JwtPayload & { data: JwtPayloadData } => {
-  const decoded = jwt.verify(token, JWT_REFRESH_TOKEN_SECRET);
-
-  if (typeof decoded === 'string') {
-    throw new Error('Refresh token inválido');
+  try {
+    const decoded = jwt.verify(token, JWT_REFRESH_TOKEN_SECRET);
+    if (typeof decoded === 'string') {
+      throw new Error('Refresh token inválido ou expirado');
+    }
+    return decoded as JwtPayload & { data: JwtPayloadData };
+  } catch (error) {
+    console.error('Erro ao verificar refresh token:', error);
+    throw new Error('Refresh token inválido ou expirado');
   }
-
-  return decoded as JwtPayload & { data: JwtPayloadData };
 };
 
 export const decodeAccessToken = (token: string) => {

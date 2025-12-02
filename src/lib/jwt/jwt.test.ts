@@ -5,6 +5,7 @@ import {
   verifyAccessToken,
   verifyRefreshToken,
   decodeAccessToken,
+  JwtPayloadData,
 } from './jwt';
 
 jest.mock('jsonwebtoken');
@@ -12,12 +13,12 @@ jest.mock('jsonwebtoken');
 const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
 
 describe('JWT Helper', () => {
-  const mockUserId = 123;
+  const mockUserId: JwtPayloadData = { userId: 123 };;
   const mockAccessToken = 'mock.access.token';
   const mockRefreshToken = 'mock.refresh.token';
 
-  const mockAccessSecret = 'minha_chave_secreta_super_segura_acesso';
-  const mockRefreshSecret = 'minha_chave_secreta_super_segura_refresh';
+  const mockAccessSecret = 'jwt_seguro_para_teste_local_1234';
+  const mockRefreshSecret = 'jwt_seguro_para_teste_local_1234';
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -34,7 +35,7 @@ describe('JWT Helper', () => {
       const result = generateAccessToken(mockUserId);
 
       expect(jwt.sign).toHaveBeenCalledWith({ data: mockUserId }, mockAccessSecret, {
-        expiresIn: '15min',
+        expiresIn: '15m',
       });
       expect(result).toBe(mockAccessToken);
     });
@@ -50,7 +51,7 @@ describe('JWT Helper', () => {
       generateAccessToken(mockUserId);
 
       expect(jwt.sign).toHaveBeenCalledWith({ data: mockUserId }, expect.any(String), {
-        expiresIn: '15min',
+        expiresIn: '15m',
       });
     });
   });
@@ -154,7 +155,7 @@ describe('JWT Helper', () => {
       expect(token).toBe(mockAccessToken);
       expect(decoded).toEqual(mockDecoded);
       expect(jwt.sign).toHaveBeenCalledWith({ data: mockUserId }, mockAccessSecret, {
-        expiresIn: '15min',
+        expiresIn: '15m',
       });
       expect(jwt.verify).toHaveBeenCalledWith(mockAccessToken, mockAccessSecret);
     });
@@ -172,13 +173,13 @@ describe('JWT Helper', () => {
 
       expect(calls).toContainEqual({
         secret: mockAccessSecret,
-        expiresIn: '15min',
+        expiresIn: '15m',
       });
       expect(calls).toContainEqual({
         secret: mockRefreshSecret,
         expiresIn: '90d',
       });
-      expect(accessToken).toBe('token-15min');
+      expect(accessToken).toBe('token-15m');
       expect(refreshToken).toBe('token-90d');
     });
   });
